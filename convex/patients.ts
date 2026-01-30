@@ -126,7 +126,7 @@ export const updatePatientResult = internalMutation({
     attestationContent: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const { patientId, attestationContent, ...updates } = args;
+    const { patientId, ...updates } = args;
     await ctx.db.patch(patientId, {
       ...updates,
       ...(updates.missingFields ? { missingFields: updates.missingFields } : {}),

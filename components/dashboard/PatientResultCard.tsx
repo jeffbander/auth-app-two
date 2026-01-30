@@ -19,6 +19,7 @@ type Patient = {
   extractedPatientName?: string;
   extractedDob?: string;
   extractedPhysician?: string;
+  attestationContent?: string;
   missingFields: string[];
   createdAt: number;
 };
@@ -47,6 +48,7 @@ export function PatientResultCard({ patient }: PatientResultCardProps) {
         ? STUDY_LABELS[patient.recommendedStudy] || patient.recommendedStudy
         : "Not specified",
       rationale: patient.rationale || "",
+      attestationContent: patient.attestationContent || null,
       physicianName: patient.extractedPhysician || "Physician",
       physicianCredentials: "",
       physicianNpi: "",

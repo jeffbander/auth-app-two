@@ -7,6 +7,7 @@ type AttestationData = {
   dateOfService: string;
   studyOrdered: string;
   rationale: string;
+  attestationContent: string | null;
   physicianName: string;
   physicianCredentials: string;
   physicianNpi: string;
@@ -80,21 +81,90 @@ export function generateAttestationPdf(data: AttestationData) {
   doc.text(`Study Ordered: ${data.studyOrdered}`, margin, y);
   y += 24;
 
-  // Clinical rationale
-  doc.setFont("helvetica", "bold");
-  doc.text("Clinical Rationale:", margin, y);
-  y += 16;
+  // Clinical content - use structured attestationContent if available, otherwise fall back to rationale
+  const clinicalText = data.attestationContent || data.rationale;
 
-  doc.setFont("helvetica", "normal");
+  // Parse structured sections from attestationContent
+  const sectionHeaders = [
+    "CURRENT SIGNS AND SYMPTOMS:",
+    "PRIOR DIAGNOSTIC STUDIES AND RESULTS:",
+    "PRIOR MANAGEMENT AND CONSERVATIVE THERAPIES:",
+    "MEDICATIONS:",
+    "JUSTIFICATION FOR ECHOCARDIOGRAM OUTSIDE 60-DAY WINDOW:",
+    "DOCUMENTATION CONFLICT RESOLUTION:",
+  ];
+
+  const hasStructuredSections = sectionHeaders.some((header) =>
+    clinicalText.includes(header)
+  );
+
   doc.setFontSize(10);
-  const rationaleLines = doc.splitTextToSize(data.rationale, contentWidth);
-  for (const line of rationaleLines) {
-    if (y > 680) {
-      doc.addPage();
-      y = margin;
+
+  if (hasStructuredSections) {
+    // Render each section with bold headers
+    const sections = clinicalText.split(/\n\n+/);
+    for (const section of sections) {
+      const trimmed = section.trim();
+      if (!trimmed) continue;
+
+      // Check if this section starts with a known header
+      const matchedHeader = sectionHeaders.find((h) => trimmed.startsWith(h));
+      if (matchedHeader) {
+        // Bold header
+        if (y > 660) {
+          doc.addPage();
+          y = margin;
+        }
+        doc.setFont("helvetica", "bold");
+        doc.text(matchedHeader, margin, y);
+        y += 16;
+
+        // Normal content after the header
+        const content = trimmed.slice(matchedHeader.length).trim();
+        if (content) {
+          doc.setFont("helvetica", "normal");
+          const contentLines = doc.splitTextToSize(content, contentWidth);
+          for (const line of contentLines) {
+            if (y > 680) {
+              doc.addPage();
+              y = margin;
+            }
+            doc.text(line, margin, y);
+            y += 14;
+          }
+        }
+        y += 8;
+      } else {
+        // Unstructured content block
+        doc.setFont("helvetica", "normal");
+        const lines = doc.splitTextToSize(trimmed, contentWidth);
+        for (const line of lines) {
+          if (y > 680) {
+            doc.addPage();
+            y = margin;
+          }
+          doc.text(line, margin, y);
+          y += 14;
+        }
+        y += 4;
+      }
     }
-    doc.text(line, margin, y);
-    y += 14;
+  } else {
+    // Fallback: render as single "Clinical Rationale" block
+    doc.setFont("helvetica", "bold");
+    doc.text("Clinical Rationale:", margin, y);
+    y += 16;
+
+    doc.setFont("helvetica", "normal");
+    const rationaleLines = doc.splitTextToSize(clinicalText, contentWidth);
+    for (const line of rationaleLines) {
+      if (y > 680) {
+        doc.addPage();
+        y = margin;
+      }
+      doc.text(line, margin, y);
+      y += 14;
+    }
   }
 
   // Signature section - position near bottom

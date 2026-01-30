@@ -171,12 +171,12 @@ export default function InputPage() {
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">
-              Clinical Notes
+              Clinical Notes (All Recent Notes)
             </label>
             <textarea
               value={clinicalNotes}
               onChange={(e) => setClinicalNotes(e.target.value)}
-              placeholder="Paste ED notes, PCP notes, physician notes here..."
+              placeholder="Paste ALL recent notes — ED notes, PCP notes, specialist notes, H&P, assessment/plan, problem list..."
               className="min-h-[200px] w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
             />
           </div>
@@ -193,12 +193,12 @@ export default function InputPage() {
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700">
-              Previous Studies
+              Previous / Scheduled Cardiac Studies
             </label>
             <textarea
               value={previousStudies}
               onChange={(e) => setPreviousStudies(e.target.value)}
-              placeholder="Paste prior EKGs, Echos, stress tests, orders..."
+              placeholder="Paste ALL recent cardiac studies — prior EKGs, Echos, stress tests, nuclear results, scheduled orders, cancelled/no-show studies..."
               className="min-h-[200px] w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none"
             />
           </div>

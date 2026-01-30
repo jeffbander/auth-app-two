@@ -35,6 +35,7 @@ export default defineSchema({
     extractedDob: v.optional(v.string()),
     extractedPhysician: v.optional(v.string()),
     attestationPdfUrl: v.optional(v.string()),
+    attestationContent: v.optional(v.string()),
     missingFields: v.array(v.string()),
     createdAt: v.number(),
     createdBy: v.string(),
